@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 from fastapi import UploadFile, File
+from services.pdf_service import extract_text_from_pdf
 import shutil
 import uuid
 from pydantic import BaseModel
@@ -44,7 +45,11 @@ def upload_resume(file: UploadFile = File(...)):
     with open(file_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
 
+    text = extract_text_from_pdf(file_path)
+
+    print(text)
+
     return {
         "message": "Resume uploaded successfully.",
-        "filename": file.filename
+        "filename": unique_filename
     }
