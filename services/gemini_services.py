@@ -1,8 +1,11 @@
 from google import genai
 from dotenv import load_dotenv
 from prompts.interview_prompt import interview_prompt
+from prompts.resume_prompt import resume_prompt
 import json
+from parsers.resume_parser import ResumeAnalysis
 from parsers.output_parser import InterviewResponse
+from google.genai.errors import ServerError
 import os
 
 load_dotenv()
@@ -28,3 +31,32 @@ def ask_gemini(prompt: str):
     parsed_response = json.loads(cleaned_response)
     validated_response = InterviewResponse.model_validate(parsed_response)
     return validated_response
+
+def analyze_resume(resume_text: str):
+    try:
+      formatted_prompt = resume_prompt(resume_text)
+
+      response = client.models.generate_content(
+          model = "gemini-2.5-flash",
+          contents=formatted_prompt
+      )
+
+      print("========== GEMINI RESPONSE ==========")
+      print(response.text)
+      print("=====================================")
+
+      cleaned = (
+         response.text
+         .replace("```json","")
+         .replace("```", "")
+         .strip()
+      )
+      parsed = json.loads(cleaned)
+      validated = ResumeAnalysis.model_validate(parsed)
+      return validated
+
+    except ServerError:
+       raise Exception(
+          "Gemini is temporarily unavailable. Please try again in a few moments"
+       )    
+

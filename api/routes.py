@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 from fastapi import UploadFile, File
 from services.pdf_service import extract_text_from_pdf
+from services.gemini_services import analyze_resume
 import shutil
 import uuid
 from pydantic import BaseModel
@@ -47,9 +48,5 @@ def upload_resume(file: UploadFile = File(...)):
 
     text = extract_text_from_pdf(file_path)
 
-    print(text)
-
-    return {
-        "message": "Resume uploaded successfully.",
-        "filename": unique_filename
-    }
+    analysis = analyze_resume(text)
+    return analysis
