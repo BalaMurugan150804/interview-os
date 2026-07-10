@@ -25,7 +25,4 @@ def health():
 @router.post("/ask")
 def ask(request: PromptRequest):
     answer = ask_gemini(request.prompt)
-
-    return {
-        "response": answer
-    }
+    return answer
