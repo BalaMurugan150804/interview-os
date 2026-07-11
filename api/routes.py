@@ -1,7 +1,9 @@
 from fastapi import APIRouter
 from fastapi import UploadFile, File
+from parsers.career_goal_parser import CareerGoal
 from services.pdf_service import extract_text_from_pdf
 from services.gemini_services import analyze_resume
+from services.career_services import choose_career_path
 import shutil
 import uuid
 from pydantic import BaseModel
@@ -50,3 +52,8 @@ def upload_resume(file: UploadFile = File(...)):
 
     analysis = analyze_resume(text)
     return analysis
+
+@router.post("/career/goal")
+def choose_goal(goal: CareerGoal):
+
+    return choose_career_path(goal.goal)
