@@ -5,3 +5,4 @@ class CareerGoalResponse(BaseModel):
     next_step: str
     message: str
     required_input: Optional[str] = None
+    prompt: Optional[str] = None
