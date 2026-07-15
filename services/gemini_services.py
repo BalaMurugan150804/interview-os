@@ -1,8 +1,9 @@
+import json
 from google import genai
 from dotenv import load_dotenv
 from prompts.interview_prompt import interview_prompt
 from prompts.resume_prompt import resume_prompt
-import json
+from services.llm_service import generate_json
 from parsers.resume_parser import ResumeAnalysis
 from parsers.output_parser import InterviewResponse
 from google.genai.errors import ServerError
@@ -35,23 +36,7 @@ def ask_gemini(prompt: str):
 def analyze_resume(resume_text: str):
     try:
       formatted_prompt = resume_prompt(resume_text)
-
-      response = client.models.generate_content(
-          model = "gemini-2.5-flash",
-          contents=formatted_prompt
-      )
-
-      print("========== GEMINI RESPONSE ==========")
-      print(response.text)
-      print("=====================================")
-
-      cleaned = (
-         response.text
-         .replace("```json","")
-         .replace("```", "")
-         .strip()
-      )
-      parsed = json.loads(cleaned)
+      parsed = generate_json(formatted_prompt)
       validated = ResumeAnalysis.model_validate(parsed)
       return validated
 
