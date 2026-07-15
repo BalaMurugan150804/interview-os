@@ -2,15 +2,17 @@ from fastapi import APIRouter
 from fastapi import UploadFile, File
 from parsers.career_goal_parser import CareerGoal
 from services.pdf_service import extract_text_from_pdf
-from services.gemini_services import analyze_resume
+from services.resume_service import analyze_resume
 from services.career_router import route_career
 from parsers.company_models import CompanyRequest
 from services.company_services import analyze_company
+from parsers.resume_parser import ResumeAnalysis
+from services.roadmap_services import generate_roadmap
 import shutil
 import uuid
 from pydantic import BaseModel
 
-from services.gemini_services import ask_gemini
+from services.resume_service import ask_gemini
 
 router = APIRouter()
 
@@ -63,3 +65,8 @@ def choose_goal(goal: CareerGoal):
 @router.post("/company/analyse")
 def company_analysis(request: CompanyRequest):
     return analyze_company(request.company_name)
+
+@router.post("/roadmap")
+def roadmap(analysis: ResumeAnalysis):
+
+    return generate_roadmap(analysis.model_dump())
